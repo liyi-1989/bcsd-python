@@ -73,7 +73,8 @@ class BiasCorrectDaily():
                                       lon_vals.shape[0]))
         # loop through each day of the year, 1 to 366
         for day in np.unique(dayofyear.values):
-            print "Day = %i" % day
+            if day % 100 == 0:
+                print "Day = %i" % day
             # select days +- pool
             dayrange = (np.arange(day-self.pool, day+self.pool+1) + 366) % 366 + 1
             days = np.in1d(dayofyear, dayrange)
@@ -91,8 +92,9 @@ class BiasCorrectDaily():
                 X_lat = subobs.sel(lat=lat, lon=lon_vals, method='nearest')[obs_var].values
                 Y_lat = submodeled.sel(lat=lat, lon=lon_vals)[modeled_var].values
                 jobs.append(delayed(mapper)(X_lat, Y_lat, train_num, self.step))
-
-            print "Running jobs", len(jobs)
+            
+            if day % 100 == 0:
+                print "Running jobs", len(jobs)
             # select only those days which correspond to the current day of the year
             day_mapped = np.asarray(Parallel(n_jobs=njobs)(jobs))[:, sub_curr_day_rows]
             day_mapped = np.swapaxes(day_mapped, 0, 1)

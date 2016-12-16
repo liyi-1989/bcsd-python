@@ -1,4 +1,4 @@
-cd ~/repos/bcsd-python/data/
+cd data
 prism='prism_example.nc'
 merra='merra_example.nc'
 prism_upscaled='prism_upscaled.nc'
