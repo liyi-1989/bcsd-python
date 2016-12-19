@@ -187,13 +187,14 @@ kde2d_point=function(x0,y0,x_given,y_given){
 }
 
 max_cond=function(x_fix,x_given,y_given){
-  ygrid=seq(from=min(y_given),to=max(y_given),length=1000)
+  ygrid=seq(from=min(y_given),to=max(y_given),length=200)
   yt=ygrid
-  u=rank(x_given)/25
-  v=rank(y_given)/25
+  n_given=length(x_given)
+  u=rank(x_given)/n_given
+  v=rank(y_given)/n_given
   for(i in 1:length(ygrid)){
     #yt[i]=kde2d_point(rank(c(x_fix,x_given))[1]/26,rank(c(ygrid[i],y_given))[1]/26,u,v)*kde1d_point(x_fix,x_given)
-    yt[i]=kde2d_point(rank(c(x_fix,x_given))[1]/26,rank(c(ygrid[i],y_given))[1]/26,u,v)*kde1d_point(ygrid[i],y_given)
+    yt[i]=kde2d_point(rank(c(x_fix,x_given))[1]/(n_given+1),rank(c(ygrid[i],y_given))[1]/(n_given+1),u,v)*kde1d_point(ygrid[i],y_given)
   }
   #plot(ygrid,yt,type="o")
   #ygrid[yt==max(yt)]
