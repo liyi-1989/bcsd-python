@@ -67,6 +67,8 @@ gcm_delta_lat=gcm_lat[2]-gcm_lat[1]
 gcm_n_lon=length(gcm_lon)
 gcm_n_lat=length(gcm_lat)
 
+Y_bcsd=Y_cbcsd=Y0
+
 for(ilon in 1:(gcm_n_lon-1)){ 
   for(jlat in 2:(gcm_n_lat)){ 
     i=gcm_lon[ilon] # i is current GCM lon
@@ -74,7 +76,8 @@ for(ilon in 1:(gcm_n_lon-1)){
 
     cat("GCM grid: lon",i,"lat",j,"...\n")
     
-    X=X0[ilon,jlat,] # current GCM grid 
+    # 0.1 Select data: current GCM grid (GCM point corresponds to the upper left corner)
+    X=X0[ilon,jlat,] 
     
     delta_lon = obs_lon - i # select obs > gcm : gcm grid point on the west (left)
     obs_selected_lon=(0<=delta_lon)&(delta_lon < gcm_delta_lon)
@@ -86,12 +89,11 @@ for(ilon in 1:(gcm_n_lon-1)){
       next
     }
     
-    # overall: GCM point corresponds to the upper left corner
-    Y=Y0[obs_selected_lon,obs_selected_lat,] # current observation in the GCM grid
-    
+    # 0.2 Select data: current observation in the GCM grid
+    Y=Y0[obs_selected_lon,obs_selected_lat,] 
     Ybar=apply(Y,3,mean, na.rm = TRUE) # upscaled observation
     
-    # Bias correction: X and Ybar
+    # 1. Bias correction: X and Ybar
     cat("Bias correction ...\n")
     Q=quantile(Ybar,ecdf(X)(X)) #Qi_test=quantile(Yim,ecdf(Xim)(Xim_test))
     # Bias correction (copula): X and Ybar
@@ -103,18 +105,25 @@ for(ilon in 1:(gcm_n_lon-1)){
       CQ[k]=max_cond(X[k],X,Ybar)
     }
     
-    # Scaling factor 
+    # 2. Scaling factor 
     cat("Spatial Disaggregation ... \n")
     M=apply(Y,c(1,2),mean, na.rm = TRUE) # Local *Historical* mean
-    Y_Q=Y
+    Y_Q=Y_CQ=Y
     for(k in 1:ntime){
       Y_Q[,,k]=Q[k]*M/mean(Q)
+      Y_CQ[,,k]=CQ[k]*M/mean(CQ)
     }
-    mseij=mean((Y_Q-Y)^2)
-    cat("mse:",mseij,"\n")
+    
+    # 3. Results
+    Y_bcsd[obs_selected_lon,obs_selected_lat,]=Y_Q
+    Y_cbcsd[obs_selected_lon,obs_selected_lat,]=Y_CQ
+    
+    #mseij=mean((Y_Q-Y)^2)
+    #cat("mse:",mseij,"\n")
   }
 }
 
+save(Y_bcsd, Y_cbcsd, Y, file="bcsd_results.RData")
 
 
 

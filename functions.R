@@ -1,4 +1,4 @@
-library(ncdf4)
+#library(ncdf4)
 library(MASS)
 
 # transform lon*lat*time to time*space
@@ -187,7 +187,7 @@ kde2d_point=function(x0,y0,x_given,y_given){
 }
 
 max_cond=function(x_fix,x_given,y_given){
-  ygrid=seq(from=min(y_given),to=max(y_given),length=200)
+  ygrid=seq(from=min(y_given),to=max(y_given),length=500)
   yt=ygrid
   n_given=length(x_given)
   u=rank(x_given)/n_given
