@@ -2,6 +2,8 @@
 # setwd("D:/works/bcsd-python")
 source('functions.R')
 library(RNetCDF)
+#library(ncdf4)
+library(snow)
 # ################### Read data with ncdf4 package ################### 
 # # school cluster (discovery) cannot install this package
 # # 1. read in reanalysis data
@@ -100,10 +102,17 @@ for(ilon in 1:(gcm_n_lon-1)){
     cat("Bias correction (copula) ...\n")
     CQ=X
     ntime=length(X)
+    # for(k in 1:ntime){
+    #   cat("correcting time ",k,"\n")
+    #   CQ[k]=max_cond(X[k],X,Ybar)
+    # }
+    
+    cl <- makeCluster(30, type = "MPI") 
+    ml=clusterApplyLB(cl, 1:ntime, function(x) max_cond(X[x],X,Ybar))
     for(k in 1:ntime){
-      cat("correcting time ",k,"\n")
-      CQ[k]=max_cond(X[k],X,Ybar)
+      CQ[k]=ml[[k]]
     }
+    stopCluster(cl)
     
     # 2. Scaling factor 
     cat("Spatial Disaggregation ... \n")
