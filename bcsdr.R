@@ -3,6 +3,7 @@
 source('functions.R')
 library(RNetCDF)
 #library(ncdf4)
+library(Rmpi)
 library(snow)
 # ################### Read data with ncdf4 package ################### 
 # # school cluster (discovery) cannot install this package
