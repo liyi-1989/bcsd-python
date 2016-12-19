@@ -108,7 +108,7 @@ for(ilon in 1:(gcm_n_lon-1)){
     # }
     
     cl <- makeCluster(30, type = "MPI") 
-    ml=clusterApplyLB(cl, 1:ntime, function(x) max_cond(X[x],X,Ybar))
+    ml=clusterApplyLB(cl, 1:ntime, function(x) {cat("correcting time ",k,"\n");max_cond(X[x],X,Ybar)})
     for(k in 1:ntime){
       CQ[k]=ml[[k]]
     }
